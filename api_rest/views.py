@@ -1,12 +1,26 @@
 import json
 
-from django.shortcuts import HttpResponse, JsonResponse, render
+from django.http import JsonResponse
+from django.shortcuts import HttpResponse, render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .models import user
 from .serializers import UserSerializer
+
+
+@api_view(['GET'])
+def get_users(request):
+    # VERIFICAÇÃO CASO O ACESSO AO NAVEGADOR NÃO SEJA GET
+    if request.method == 'GET':
+        users = user.objects.all()
+
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
+
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 # #  Resumo de banco de dados, alguns comandos mais usados
 # def databaseEmdjango():
