@@ -72,6 +72,26 @@ def user_manager(request):
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
+# EDITANDO DADOS  PUT
+    if request.method == 'PUT':
+
+        nickname = request.data['user_nickname']
+        try:
+            update_user = user.objects.get(pk=nickname)
+        except User.DoesNotExist:
+
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        print(request.data)
+
+        serializer = UserSerializer(update_user, data=request.data)
+
+        if serializer.is_valid()
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+        return Response(status=status.HTTP_202_ACCEPTED0)
+
+
 # #  Resumo de banco de dados, alguns comandos mais usados
 # def databaseEmdjango():
 
