@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .models import user
+from .models import User
 from .serializers import UserSerializer
 
 
@@ -14,12 +14,50 @@ from .serializers import UserSerializer
 def get_users(request):
     # VERIFICAÇÃO CASO O ACESSO AO NAVEGADOR NÃO SEJA GET
     if request.method == 'GET':
-        users = user.objects.all()
+        users = User.objects.all()
 
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
 
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_by_nick(request, nick):
+
+    try:
+        user = User.objects.get(pk=nick)
+    except User.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+
+# CRUDZÃO DA MASSA
+
+
+@api_view(['GET', 'POST', 'PUT', 'DELETE'])
+def user_manager(request):
+
+    if request.method == 'GET':
+
+        try:
+            if request.GET['user']:
+
+                user_nickname = request.GET['user']
+                try:
+                    user = User.objects.get(pk=user_nickname)
+                except User.DoesNotExist:
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+                serializer = UserSerializer(user)
+                return Response(serializer.data)
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 # #  Resumo de banco de dados, alguns comandos mais usados
